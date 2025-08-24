@@ -1242,7 +1242,7 @@ class AnalyticsEvent {
 
 **🌟 如果这个指南对你有帮助，请给个 Star 支持一下！ 🌟**
 
-[![GitHub stars](https://img.shields.io/github/stars/your-repo/flutter-analytics?style=social)](https://github.com/your-repo/flutter-analytics)
-[![GitHub forks](https://img.shields.io/github/forks/your-repo/flutter-analytics?style=social)](https://github.com/your-repo/flutter-analytics)
+[![GitHub stars](https://img.shields.io/github/stars/1989allen126/language-tutorial?style=social)](https://github.com/1989allen126/language-tutorial)
+[![GitHub forks](https://img.shields.io/github/forks/1989allen126/language-tutorial?style=social)](https://github.com/1989allen126/language-tutorial)
 
 </div>

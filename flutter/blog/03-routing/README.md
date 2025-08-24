@@ -12,16 +12,19 @@
 <summary>🎯 快速导航</summary>
 
 ### 🚀 基础篇
+
 - [🧭 基础路由系统](basic-routing.md) - Navigator 1.0 和命名路由
 - [📱 声明式路由](declarative-routing.md) - Navigator 2.0 和 Go Router
 - [🛡️ 路由守卫](route-guards.md) - 权限控制和页面保护
 
 ### 🎨 高级篇
+
 - [🔗 深度链接](deep-linking.md) - URL 路由和外部链接处理
 - [🎬 页面转场](page-transitions.md) - 自定义转场动画效果
 - [🏗️ 嵌套路由](nested-routing.md) - 复杂页面结构的路由管理
 
 ### 🛠️ 实战篇
+
 - [💾 状态管理](navigation-state.md) - 页面状态的保存和恢复
 - [🧪 路由测试](routing-testing.md) - 导航逻辑的单元测试
 
@@ -42,14 +45,14 @@ graph TB
         E --> G[Deep Links]
         E --> H[State Management]
     end
-    
+
     subgraph "路由类型"
         I[Named Routes] --> J[参数传递]
         K[Go Router] --> L[声明式路由]
         M[Auto Route] --> N[代码生成]
         O[Beamer] --> P[URL 路由]
     end
-    
+
     subgraph "导航功能"
         Q[页面转场] --> R[动画效果]
         S[嵌套路由] --> T[Tab 导航]
@@ -68,11 +71,11 @@ sequenceDiagram
     participant Guard as 路由守卫
     participant Page as 目标页面
     participant State as 状态管理
-    
+
     User->>Widget: 触发导航操作
     Widget->>Router: 请求路由跳转
     Router->>Guard: 检查访问权限
-    
+
     alt 权限验证通过
         Guard-->>Router: 允许访问
         Router->>State: 更新导航状态
@@ -88,18 +91,21 @@ sequenceDiagram
 ## 🎯 核心学习目标
 
 ### 📚 理论知识
+
 - ✅ 深入理解 Flutter 路由系统架构
 - ✅ 掌握 Navigator 1.0 和 2.0 的区别
 - ✅ 了解声明式路由的优势和实现
 - ✅ 学会路由守卫和权限控制机制
 
 ### 🛠️ 实践技能
+
 - ✅ 熟练使用 Go Router 和 Auto Route
 - ✅ 掌握深度链接和 URL 路由处理
 - ✅ 学会自定义页面转场动画
 - ✅ 能够设计复杂的嵌套路由架构
 
 ### 🎨 架构能力
+
 - ✅ 理解路由状态管理策略
 - ✅ 掌握路由测试方法
 - ✅ 学会性能优化技巧
@@ -169,15 +175,15 @@ class MyApp extends StatelessWidget {
     redirect: (context, state) {
       final isLoggedIn = AuthService.instance.isLoggedIn;
       final isLoggingIn = state.location == '/login';
-      
+
       if (!isLoggedIn && !isLoggingIn) {
         return '/login';
       }
-      
+
       if (isLoggedIn && isLoggingIn) {
         return '/';
       }
-      
+
       return null;
     },
   );
@@ -224,7 +230,7 @@ class HomePage extends StatelessWidget {
               style: TextStyle(fontSize: 24),
             ),
             const SizedBox(height: 20),
-            
+
             // 导航到个人资料页
             ElevatedButton(
               onPressed: () => context.pushNamed(
@@ -233,9 +239,9 @@ class HomePage extends StatelessWidget {
               ),
               child: const Text('查看个人资料'),
             ),
-            
+
             const SizedBox(height: 10),
-            
+
             // 导航到设置页
             ElevatedButton(
               onPressed: () => context.pushNamed('settings'),
@@ -251,7 +257,7 @@ class HomePage extends StatelessWidget {
 // 个人资料页组件
 class ProfilePage extends StatelessWidget {
   final String userId;
-  
+
   const ProfilePage({super.key, required this.userId});
 
   @override
@@ -293,15 +299,15 @@ class ProfilePage extends StatelessWidget {
 
 ### 路由库特性对比
 
-| 特性 | Navigator 1.0 | Go Router | Auto Route | Beamer |
-|------|---------------|-----------|------------|--------|
-| 学习成本 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
-| 类型安全 | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| 代码生成 | ❌ | ❌ | ✅ | ❌ |
-| 深度链接 | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| 嵌套路由 | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| 路由守卫 | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| 性能 | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| 特性     | Navigator 1.0 | Go Router  | Auto Route | Beamer     |
+| -------- | ------------- | ---------- | ---------- | ---------- |
+| 学习成本 | ⭐⭐⭐⭐⭐    | ⭐⭐⭐⭐   | ⭐⭐⭐     | ⭐⭐⭐⭐   |
+| 类型安全 | ⭐⭐          | ⭐⭐⭐⭐   | ⭐⭐⭐⭐⭐ | ⭐⭐⭐     |
+| 代码生成 | ❌            | ❌         | ✅         | ❌         |
+| 深度链接 | ⭐⭐⭐        | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐   | ⭐⭐⭐⭐⭐ |
+| 嵌套路由 | ⭐⭐⭐        | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐   |
+| 路由守卫 | ⭐⭐          | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐   | ⭐⭐⭐⭐   |
+| 性能     | ⭐⭐⭐⭐      | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐   | ⭐⭐⭐⭐   |
 
 ### 使用场景建议
 
@@ -311,7 +317,7 @@ graph LR
     C[中等应用] --> D[Go Router]
     E[复杂应用] --> F[Auto Route]
     G[Web 应用] --> H[Beamer]
-    
+
     style A fill:#e1f5fe
     style C fill:#f3e5f5
     style E fill:#fff3e0
@@ -321,24 +327,28 @@ graph LR
 ### 选择指南
 
 #### 🎯 选择 Navigator 1.0 的场景
+
 - 简单的页面导航需求
 - 快速原型开发
 - 团队对传统路由熟悉
 - 不需要复杂的路由功能
 
 #### ⚡ 选择 Go Router 的场景
+
 - 需要深度链接支持
 - 复杂的嵌套路由结构
 - 路由守卫和权限控制
 - 现代化的路由解决方案
 
 #### 🚀 选择 Auto Route 的场景
+
 - 需要类型安全的路由
 - 大型企业级应用
 - 复杂的路由参数处理
 - 代码生成的优势
 
 #### 🌐 选择 Beamer 的场景
+
 - Web 应用开发
 - URL 驱动的路由
 - 需要 SEO 优化
@@ -358,19 +368,19 @@ abstract class RoutingStrategy {
 
 class GoRouterStrategy implements RoutingStrategy {
   final GoRouter router;
-  
+
   GoRouterStrategy(this.router);
-  
+
   @override
   Future<void> navigate(String route, {Map<String, dynamic>? arguments}) async {
     await router.push(route, extra: arguments);
   }
-  
+
   @override
   void pop() {
     router.pop();
   }
-  
+
   @override
   bool canPop() {
     return router.canPop();
@@ -379,19 +389,19 @@ class GoRouterStrategy implements RoutingStrategy {
 
 class NavigatorStrategy implements RoutingStrategy {
   final NavigatorState navigator;
-  
+
   NavigatorStrategy(this.navigator);
-  
+
   @override
   Future<void> navigate(String route, {Map<String, dynamic>? arguments}) async {
     await navigator.pushNamed(route, arguments: arguments);
   }
-  
+
   @override
   void pop() {
     navigator.pop();
   }
-  
+
   @override
   bool canPop() {
     return navigator.canPop();
@@ -408,7 +418,7 @@ class RouteObserver extends NavigatorObserver {
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPush(route, previousRoute);
     print('🔄 页面推入: ${route.settings.name}');
-    
+
     // 通知路由状态变化
     RouteStateManager.instance.notifyRouteChanged(
       currentRoute: route.settings.name,
@@ -416,12 +426,12 @@ class RouteObserver extends NavigatorObserver {
       action: RouteAction.push,
     );
   }
-  
+
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
     print('🔄 页面弹出: ${route.settings.name}');
-    
+
     RouteStateManager.instance.notifyRouteChanged(
       currentRoute: previousRoute?.settings.name,
       previousRoute: route.settings.name,
@@ -433,12 +443,12 @@ class RouteObserver extends NavigatorObserver {
 class RouteStateManager extends ChangeNotifier {
   static RouteStateManager? _instance;
   static RouteStateManager get instance => _instance ??= RouteStateManager._();
-  
+
   RouteStateManager._();
-  
+
   String? _currentRoute;
   String? get currentRoute => _currentRoute;
-  
+
   void notifyRouteChanged({
     String? currentRoute,
     String? previousRoute,
@@ -446,14 +456,14 @@ class RouteStateManager extends ChangeNotifier {
   }) {
     _currentRoute = currentRoute;
     notifyListeners();
-    
+
     // 记录路由历史
     _addToHistory(currentRoute, action);
   }
-  
+
   final List<RouteHistory> _history = [];
   List<RouteHistory> get history => List.unmodifiable(_history);
-  
+
   void _addToHistory(String? route, RouteAction action) {
     _history.add(RouteHistory(
       route: route,
@@ -469,7 +479,7 @@ class RouteHistory {
   final String? route;
   final RouteAction action;
   final DateTime timestamp;
-  
+
   RouteHistory({
     required this.route,
     required this.action,
@@ -499,7 +509,7 @@ class RouteFactory {
       opaque: opaque,
     );
   }
-  
+
   static Route<dynamic> createCustomRoute({
     required String routeName,
     required WidgetBuilder builder,
@@ -512,11 +522,11 @@ class RouteFactory {
         const begin = Offset(1.0, 0.0);
         const end = Offset.zero;
         const curve = Curves.easeInOut;
-        
+
         var tween = Tween(begin: begin, end: end).chain(
           CurveTween(curve: curve),
         );
-        
+
         return SlideTransition(
           position: animation.drive(tween),
           child: child,
@@ -532,16 +542,19 @@ class RouteFactory {
 ## 🔧 开发工具推荐
 
 ### 📱 调试工具
+
 - **Flutter Inspector**: 查看路由栈和页面结构
 - **Go Router Inspector**: Go Router 专用调试工具
 - **Route Debugger**: 路由调试和日志工具
 
 ### 🎨 设计工具
+
 - **Figma**: 页面流程设计
 - **Draw.io**: 路由架构图绘制
 - **Mermaid**: 代码中的流程图
 
 ### 📚 学习资源
+
 - **官方文档**: 各路由库的官方文档
 - **GitHub 示例**: 官方示例项目
 - **社区博客**: 技术博客和教程
@@ -565,24 +578,28 @@ graph TD
 ### 🎯 阶段目标
 
 #### 第一阶段：基础掌握
+
 - [ ] 理解 Flutter 路由系统基础概念
 - [ ] 掌握 Navigator 1.0 的使用方法
 - [ ] 学会命名路由和参数传递
 - [ ] 完成简单的页面导航应用
 
 #### 第二阶段：进阶学习
+
 - [ ] 深入学习 Go Router 配置
 - [ ] 掌握路由守卫和权限控制
 - [ ] 学会深度链接处理
 - [ ] 完成中等复杂度的路由应用
 
 #### 第三阶段：高级应用
+
 - [ ] 掌握嵌套路由和复杂导航
 - [ ] 学会自定义页面转场动画
 - [ ] 理解路由状态管理
 - [ ] 完成大型应用的路由架构
 
 #### 第四阶段：实战项目
+
 - [ ] 完成完整的商业级应用
 - [ ] 掌握路由测试方法
 - [ ] 学会性能优化技巧
@@ -599,7 +616,7 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String login = '/login';
-  
+
   // 动态路由参数
   static String profileWithId(String userId) => '/profile/$userId';
   static String productDetail(String productId) => '/product/$productId';
@@ -610,7 +627,7 @@ class RouteParams {
   final String? userId;
   final String? productId;
   final Map<String, dynamic>? extra;
-  
+
   const RouteParams({
     this.userId,
     this.productId,
@@ -620,9 +637,9 @@ class RouteParams {
 
 // ✅ 推荐：路由服务封装
 class NavigationService {
-  static final GlobalKey<NavigatorState> navigatorKey = 
+  static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
-  
+
   static Future<T?> pushNamed<T>(
     String routeName, {
     Object? arguments,
@@ -632,11 +649,11 @@ class NavigationService {
       arguments: arguments,
     );
   }
-  
+
   static void pop<T>([T? result]) {
     return navigatorKey.currentState!.pop<T>(result);
   }
-  
+
   static Future<T?> pushReplacementNamed<T, TO>(
     String routeName, {
     Object? arguments,
@@ -650,18 +667,21 @@ class NavigationService {
 ```
 
 ### 🎨 架构原则
+
 - **单一职责**: 每个路由只负责一个页面
 - **开闭原则**: 对扩展开放，对修改关闭
 - **依赖倒置**: 依赖抽象而非具体实现
 - **接口隔离**: 使用小而精确的接口
 
 ### ⚡ 性能优化
+
 - 使用懒加载减少初始包大小
 - 合理使用页面缓存
 - 优化页面转场动画性能
 - 避免不必要的路由重建
 
 ### 🧪 测试策略
+
 - 路由单元测试覆盖率 ≥ 90%
 - 集成测试覆盖关键用户流程
 - 自动化测试集成 CI/CD
@@ -670,17 +690,20 @@ class NavigationService {
 ## 📚 相关资源
 
 ### 🔗 官方资源
+
 - [Flutter Navigation 官方文档](https://docs.flutter.dev/development/ui/navigation)
 - [Go Router 官方文档](https://pub.dev/packages/go_router)
 - [Auto Route 官方文档](https://pub.dev/packages/auto_route)
 - [Beamer 官方文档](https://pub.dev/packages/beamer)
 
 ### 📖 推荐书籍
+
 - 《Flutter 实战》
 - 《Flutter 开发实战详解》
 - 《Flutter 技术入门与实战》
 
 ### 🎥 视频教程
+
 - [Flutter 官方 YouTube 频道](https://www.youtube.com/c/FlutterDev)
 - [B 站 Flutter 教程](https://www.bilibili.com/video/BV1S4411E7LY)
 
@@ -698,7 +721,7 @@ class NavigationService {
 
 **🌟 如果这个指南对你有帮助，请给个 Star 支持一下！ 🌟**
 
-[![GitHub stars](https://img.shields.io/github/stars/your-repo/flutter-routing?style=social)](https://github.com/your-repo/flutter-routing)
-[![GitHub forks](https://img.shields.io/github/forks/your-repo/flutter-routing?style=social)](https://github.com/your-repo/flutter-routing)
+[![GitHub stars](https://img.shields.io/github/stars/1989allen126/language-tutorial?style=social)](https://github.com/1989allen126/language-tutorial)
+[![GitHub forks](https://img.shields.io/github/forks/1989allen126/language-tutorial?style=social)](https://github.com/1989allen126/language-tutorial)
 
 </div>

@@ -324,8 +324,8 @@ Flutter FFI (Foreign Function Interface) 的使用指南，实现与原生平台
 ## 📞 联系我们
 
 - 📧 邮箱: flutter-guide@example.com
-- 💬 讨论: [GitHub Discussions](https://github.com/your-repo/discussions)
-- 🐛 问题反馈: [GitHub Issues](https://github.com/your-repo/issues)
+- 💬 讨论: [GitHub Discussions](https://github.com/1989allen126/language-tutorial/discussions)
+- 🐛 问题反馈: [GitHub Issues](https://github.com/1989allen126/language-tutorial/issues)
 
 ## 🙏 致谢
 

@@ -216,14 +216,14 @@ Flutter FFI (Foreign Function Interface) 的使用指南，实现与原生平台
 
 ### 学习路径
 
-#### 初学者路径 (0-3个月)
+#### 初学者路径
 1. [基础 Widget](./01-ui-components/basic-widgets.md) - 了解基本组件
 2. [布局组件](./01-ui-components/layout-widgets.md) - 掌握布局技巧
 3. [状态管理基础](./04-state-management/state-basics.md) - 理解状态概念
 4. [基础路由](./03-routing/basic-routing.md) - 实现页面导航
 5. [数据持久化基础](./10-data-persistence/shared-preferences.md) - 本地数据存储
 
-#### 进阶路径 (3-6个月)
+#### 进阶路径
 1. [自定义组件](./01-ui-components/custom-widgets.md) - 创建复用组件
 2. [网络请求](./02-network/http-client.md) - 处理数据交互
 3. [状态管理方案](./04-state-management/provider.md) - 选择合适方案
@@ -231,7 +231,7 @@ Flutter FFI (Foreign Function Interface) 的使用指南，实现与原生平台
 5. [并发编程](./06-best-practices/concurrency-best-practices.md) - 异步编程基础
 6. [测试基础](./11-testing/unit-testing.md) - 保证代码质量
 
-#### 高级路径 (6个月以上)
+#### 高级路径
 1. [架构设计](./06-best-practices/architecture-design.md) - 设计应用架构
 2. [设计模式](./12-design-patterns/singleton-pattern.md) - 提高代码质量
 3. [原生通信](./07-native-communication/platform-channels.md) - 平台集成

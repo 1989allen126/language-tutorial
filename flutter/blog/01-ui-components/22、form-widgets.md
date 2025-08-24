@@ -8,13 +8,15 @@
 
 ## 📊 文章概览
 
-| 章节                          | 内容         | 难度等级 |
-| ----------------------------- | ------------ | -------- |
-| [表单基础](#表单基础)         | 基础表单实现 | ⭐⭐     |
-| [输入组件](#输入组件)         | 各种输入控件 | ⭐⭐⭐   |
-| [选择组件](#选择组件)         | 选择器组件   | ⭐⭐⭐   |
-| [表单验证](#表单验证)         | 表单验证机制 | ⭐⭐⭐⭐ |
-| [表单状态管理](#表单状态管理) | 状态管理策略 | ⭐⭐⭐⭐ |
+| 章节                          | 内容         | 难度等级   |
+| ----------------------------- | ------------ | ---------- |
+| [表单基础](#表单基础)         | 基础表单实现 | ⭐⭐       |
+| [输入组件](#输入组件)         | 各种输入控件 | ⭐⭐⭐     |
+| [选择组件](#选择组件)         | 选择器组件   | ⭐⭐⭐     |
+| [表单验证](#表单验证)         | 表单验证机制 | ⭐⭐⭐⭐   |
+| [表单状态管理](#表单状态管理) | 状态管理策略 | ⭐⭐⭐⭐   |
+| [智能表单验证](#智能表单验证) | 高级验证功能 | ⭐⭐⭐⭐⭐ |
+| [动态表单生成](#动态表单生成) | 动态表单组件 | ⭐⭐⭐⭐⭐ |
 
 ## 🎯 学习目标
 
@@ -1002,29 +1004,692 @@ class CustomSelector<T> extends StatelessWidget {
 }
 ```
 
+## 🧠 智能表单验证
+
+### 高级验证器组合
+
+```dart
+// lib/utils/smart_validators.dart
+class SmartFormValidator {
+  static String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return '请输入邮箱地址';
+    }
+
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value)) {
+      return '请输入有效的邮箱地址';
+    }
+
+    return null;
+  }
+
+  static String? validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return '请输入密码';
+    }
+
+    if (value.length < 8) {
+      return '密码长度至少8位';
+    }
+
+    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
+      return '密码必须包含大小写字母和数字';
+    }
+
+    return null;
+  }
+
+  static String? validatePhone(String? value) {
+    if (value == null || value.isEmpty) {
+      return '请输入手机号码';
+    }
+
+    final phoneRegex = RegExp(r'^1[3-9]\d{9}$');
+    if (!phoneRegex.hasMatch(value)) {
+      return '请输入有效的手机号码';
+    }
+
+    return null;
+  }
+
+  static String? validateRequired(String? value, String fieldName) {
+    if (value == null || value.trim().isEmpty) {
+      return '请输入$fieldName';
+    }
+    return null;
+  }
+
+  static String? validateLength(String? value, int minLength, int maxLength, String fieldName) {
+    if (value == null || value.isEmpty) {
+      return '请输入$fieldName';
+    }
+
+    if (value.length < minLength) {
+      return '$fieldName长度不能少于$minLength位';
+    }
+
+    if (value.length > maxLength) {
+      return '$fieldName长度不能超过$maxLength位';
+    }
+
+    return null;
+  }
+}
+
+// 带动画的智能输入框
+class AnimatedTextField extends StatefulWidget {
+  final String label;
+  final String? hint;
+  final IconData? prefixIcon;
+  final bool obscureText;
+  final TextInputType keyboardType;
+  final String? Function(String?)? validator;
+  final Function(String)? onChanged;
+  final TextEditingController? controller;
+  final bool enabled;
+
+  const AnimatedTextField({
+    Key? key,
+    required this.label,
+    this.hint,
+    this.prefixIcon,
+    this.obscureText = false,
+    this.keyboardType = TextInputType.text,
+    this.validator,
+    this.onChanged,
+    this.controller,
+    this.enabled = true,
+  }) : super(key: key);
+
+  @override
+  _AnimatedTextFieldState createState() => _AnimatedTextFieldState();
+}
+
+class _AnimatedTextFieldState extends State<AnimatedTextField>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _labelAnimation;
+  late Animation<Color?> _borderColorAnimation;
+
+  final FocusNode _focusNode = FocusNode();
+  bool _hasError = false;
+  bool _isFocused = false;
+  bool _hasText = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: Duration(milliseconds: 200),
+      vsync: this,
+    );
+
+    _labelAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+
+    _borderColorAnimation = ColorTween(
+      begin: Colors.grey[400],
+      end: Colors.blue,
+    ).animate(_animationController);
+
+    _focusNode.addListener(_onFocusChange);
+
+    if (widget.controller != null) {
+      widget.controller!.addListener(_onTextChange);
+      _hasText = widget.controller!.text.isNotEmpty;
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    setState(() {
+      _isFocused = _focusNode.hasFocus;
+    });
+
+    if (_isFocused || _hasText) {
+      _animationController.forward();
+    } else {
+      _animationController.reverse();
+    }
+  }
+
+  void _onTextChange() {
+    final hasText = widget.controller!.text.isNotEmpty;
+    if (hasText != _hasText) {
+      setState(() {
+        _hasText = hasText;
+      });
+
+      if (_hasText || _isFocused) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (context, child) {
+        return Container(
+          margin: EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: _hasError
+                        ? Colors.red
+                        : (_borderColorAnimation.value ?? Colors.grey[400]!),
+                    width: _isFocused ? 2.0 : 1.0,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Stack(
+                  children: [
+                    TextFormField(
+                      controller: widget.controller,
+                      focusNode: _focusNode,
+                      obscureText: widget.obscureText,
+                      keyboardType: widget.keyboardType,
+                      enabled: widget.enabled,
+                      onChanged: widget.onChanged,
+                      validator: (value) {
+                        final error = widget.validator?.call(value);
+                        setState(() {
+                          _hasError = error != null;
+                        });
+                        return error;
+                      },
+                      decoration: InputDecoration(
+                        hintText: widget.hint,
+                        prefixIcon: widget.prefixIcon != null
+                            ? Icon(
+                                widget.prefixIcon,
+                                color: _isFocused ? Colors.blue : Colors.grey[600],
+                              )
+                            : null,
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                      ),
+                    ),
+                    // 浮动标签
+                    Positioned(
+                      left: widget.prefixIcon != null ? 48 : 16,
+                      top: _labelAnimation.value * 8 + 8,
+                      child: Transform.scale(
+                        scale: 1.0 - (_labelAnimation.value * 0.2),
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          widget.label,
+                          style: TextStyle(
+                            color: _hasError
+                                ? Colors.red
+                                : (_isFocused ? Colors.blue : Colors.grey[600]),
+                            fontSize: 16 - (_labelAnimation.value * 2),
+                            fontWeight: _isFocused ? FontWeight.w500 : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+```
+
+## 🔄 动态表单生成
+
+### 多步骤表单组件
+
+```dart
+// lib/widgets/multi_step_form.dart
+class MultiStepForm extends StatefulWidget {
+  final List<FormStep> steps;
+  final Function(Map<String, dynamic>) onCompleted;
+  final String? title;
+
+  const MultiStepForm({
+    Key? key,
+    required this.steps,
+    required this.onCompleted,
+    this.title,
+  }) : super(key: key);
+
+  @override
+  _MultiStepFormState createState() => _MultiStepFormState();
+}
+
+class _MultiStepFormState extends State<MultiStepForm> {
+  int _currentStep = 0;
+  final Map<String, dynamic> _formData = {};
+  final List<GlobalKey<FormState>> _formKeys = [];
+
+  @override
+  void initState() {
+    super.initState();
+    for (int i = 0; i < widget.steps.length; i++) {
+      _formKeys.add(GlobalKey<FormState>());
+    }
+  }
+
+  bool _validateCurrentStep() {
+    return _formKeys[_currentStep].currentState?.validate() ?? false;
+  }
+
+  void _nextStep() {
+    if (_validateCurrentStep()) {
+      // 保存当前步骤的数据
+      _formKeys[_currentStep].currentState?.save();
+
+      if (_currentStep < widget.steps.length - 1) {
+        setState(() {
+          _currentStep++;
+        });
+      } else {
+        // 完成表单
+        widget.onCompleted(_formData);
+      }
+    }
+  }
+
+  void _previousStep() {
+    if (_currentStep > 0) {
+      setState(() {
+        _currentStep--;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title ?? '多步骤表单'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: Column(
+        children: [
+          // 步骤指示器
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: List.generate(widget.steps.length, (index) {
+                return Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Container(
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: index <= _currentStep
+                                ? Colors.blue
+                                : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      if (index < widget.steps.length - 1)
+                        SizedBox(width: 8),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ),
+          // 步骤标题
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: Colors.blue,
+                  child: Text(
+                    '${_currentStep + 1}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.steps[_currentStep].title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // 表单内容
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Form(
+                key: _formKeys[_currentStep],
+                child: widget.steps[_currentStep].content,
+              ),
+            ),
+          ),
+          // 导航按钮
+          Container(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                if (_currentStep > 0)
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: _previousStep,
+                      child: Text('上一步'),
+                    ),
+                  ),
+                if (_currentStep > 0) SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: _nextStep,
+                    child: Text(
+                      _currentStep == widget.steps.length - 1 ? '完成' : '下一步',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FormStep {
+  final String title;
+  final Widget content;
+  final Map<String, dynamic>? data;
+
+  FormStep({
+    required this.title,
+    required this.content,
+    this.data,
+  });
+}
+
+// 动态表单生成器
+class DynamicFormGenerator extends StatefulWidget {
+  final List<FormFieldConfig> fieldConfigs;
+  final Function(Map<String, dynamic>) onSubmit;
+  final String submitButtonText;
+
+  const DynamicFormGenerator({
+    Key? key,
+    required this.fieldConfigs,
+    required this.onSubmit,
+    this.submitButtonText = '提交',
+  }) : super(key: key);
+
+  @override
+  _DynamicFormGeneratorState createState() => _DynamicFormGeneratorState();
+}
+
+class _DynamicFormGeneratorState extends State<DynamicFormGenerator> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final Map<String, dynamic> _formData = {};
+  final Map<String, TextEditingController> _controllers = {};
+
+  @override
+  void initState() {
+    super.initState();
+    for (final config in widget.fieldConfigs) {
+      if (config.type == FormFieldType.text ||
+          config.type == FormFieldType.email ||
+          config.type == FormFieldType.password) {
+        _controllers[config.key] = TextEditingController();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controllers.values.forEach((controller) => controller.dispose());
+    super.dispose();
+  }
+
+  Widget _buildField(FormFieldConfig config) {
+    switch (config.type) {
+      case FormFieldType.text:
+      case FormFieldType.email:
+      case FormFieldType.password:
+        return AnimatedTextField(
+          label: config.label,
+          hint: config.hint,
+          prefixIcon: config.icon,
+          obscureText: config.type == FormFieldType.password,
+          keyboardType: config.type == FormFieldType.email
+              ? TextInputType.emailAddress
+              : TextInputType.text,
+          controller: _controllers[config.key],
+          validator: config.validator,
+          onChanged: (value) {
+            _formData[config.key] = value;
+          },
+        );
+
+      case FormFieldType.dropdown:
+        return DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: config.label,
+            border: OutlineInputBorder(),
+          ),
+          items: config.options?.map((option) {
+            return DropdownMenuItem<String>(
+              value: option,
+              child: Text(option),
+            );
+          }).toList(),
+          onChanged: (value) {
+            setState(() {
+              _formData[config.key] = value;
+            });
+          },
+          validator: config.validator,
+        );
+
+      case FormFieldType.checkbox:
+        return CheckboxListTile(
+          title: Text(config.label),
+          value: _formData[config.key] ?? false,
+          onChanged: (value) {
+            setState(() {
+              _formData[config.key] = value;
+            });
+          },
+        );
+
+      case FormFieldType.radio:
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              config.label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            ...config.options!.map((option) {
+              return RadioListTile<String>(
+                title: Text(option),
+                value: option,
+                groupValue: _formData[config.key],
+                onChanged: (value) {
+                  setState(() {
+                    _formData[config.key] = value;
+                  });
+                },
+              );
+            }).toList(),
+          ],
+        );
+
+      default:
+        return SizedBox.shrink();
+    }
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState?.validate() ?? false) {
+      _formKey.currentState?.save();
+      widget.onSubmit(_formData);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          ...widget.fieldConfigs.map((config) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 8),
+              child: _buildField(config),
+            );
+          }).toList(),
+          SizedBox(height: 24),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _submitForm,
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Text(
+                widget.submitButtonText,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+enum FormFieldType {
+  text,
+  email,
+  password,
+  dropdown,
+  checkbox,
+  radio,
+}
+
+class FormFieldConfig {
+  final String key;
+  final String label;
+  final FormFieldType type;
+  final String? hint;
+  final IconData? icon;
+  final List<String>? options;
+  final String? Function(String?)? validator;
+  final bool required;
+
+  FormFieldConfig({
+    required this.key,
+    required this.label,
+    required this.type,
+    this.hint,
+    this.icon,
+    this.options,
+    this.validator,
+    this.required = false,
+  });
+}
+```
+
 ## 📊 总结
 
-Flutter 表单组件提供了丰富的功能：
+Flutter 表单组件提供了丰富的功能，通过本文的深入学习，你应该能够：
 
-### 核心组件
+### 核心组件掌握
 
-1. **TextFormField**：文本输入的核心组件
-2. **DropdownButtonFormField**：下拉选择组件
-3. **Checkbox/Radio**：单选和多选组件
-4. **Slider**：滑块选择组件
+1. **TextFormField**：文本输入的核心组件，支持丰富的自定义
+2. **DropdownButtonFormField**：下拉选择组件，适合选项较多的场景
+3. **Checkbox/Radio**：单选和多选组件，处理布尔值和单选逻辑
+4. **Slider**：滑块选择组件，适合数值范围选择
+5. **AnimatedTextField**：带动画效果的高级文本输入组件
 
-### 最佳实践
+### 高级功能实现
 
-1. **表单验证**：使用组合验证器提高代码复用性
-2. **状态管理**：合理管理表单状态和用户输入
-3. **用户体验**：提供清晰的错误提示和加载状态
-4. **自定义组件**：创建符合设计规范的表单组件
+1. **智能验证**：使用组合验证器和实时验证提高用户体验
+2. **动态表单**：根据配置动态生成表单组件
+3. **多步骤表单**：处理复杂的分步骤数据收集
+4. **状态管理**：合理管理表单状态和用户输入
+5. **动画效果**：提供流畅的交互动画和视觉反馈
 
-### 推荐工具
+### 表单设计原则
 
-- **flutter_form_builder**：强大的表单构建器
-- **reactive_forms**：响应式表单管理
-- **form_validator**：表单验证工具
+1. **简洁明了**：避免不必要的字段，保持表单简洁
+2. **逻辑分组**：相关字段分组显示，提升填写效率
+3. **即时反馈**：提供实时验证和清晰的错误提示
+4. **渐进式披露**：复杂表单采用多步骤或条件显示
+5. **无障碍支持**：确保所有用户都能顺利使用表单
+
+### 性能优化技巧
+
+1. **合理使用控制器**：避免不必要的 TextEditingController 创建
+2. **延迟验证**：在用户完成输入后再进行验证
+3. **状态管理**：使用适当的状态管理方案处理复杂表单
+4. **内存管理**：及时释放控制器和监听器资源
+
+### 推荐工具和库
+
+- **flutter_form_builder**：强大的表单构建工具
+- **reactive_forms**：响应式表单框架
+- **form_field_validator**：丰富的表单验证工具
+- **flutter_typeahead**：自动完成输入组件
 - **mask_text_input_formatter**：输入格式化工具
 
-通过掌握这些表单组件的使用方法，可以构建出功能完善、用户体验良好的表单界面。
+### 下一步学习
+
+- [动画组件](animation-widgets.md) - 为表单添加精美的动画效果
+- [自定义组件](custom-widgets.md) - 创建专属的表单组件
+- [状态管理](state-management.md) - 学习高级状态管理技巧
+- [数据持久化](data-persistence.md) - 学习表单数据的存储和同步
+
+记住，优秀的表单设计不仅仅是功能完整，更重要的是让用户感到简单、直观和愉悦。在实践中不断优化和创新，你一定能创建出用户喜爱的表单体验！
